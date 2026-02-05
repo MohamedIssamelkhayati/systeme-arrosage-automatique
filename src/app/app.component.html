@@ -1,0 +1,232 @@
+<div class="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-teal-50 p-4 md:p-8">
+      <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="mb-8">
+          <div class="flex items-center justify-between">
+            <div>
+              <h1 class="text-4xl font-bold text-gray-800 mb-2 flex items-center gap-3">
+                <div class="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center">
+                  <svg class="text-white" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+                  </svg>
+                </div>
+                Plante Intelligente
+              </h1>
+              <p class="text-gray-600">Système de surveillance et d'arrosage automatique</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <div [class]="isConnected ? 'flex items-center gap-2 px-4 py-2 rounded-lg bg-green-100' : 'flex items-center gap-2 px-4 py-2 rounded-lg bg-red-100'">
+                <div [class]="isConnected ? 'w-2 h-2 rounded-full bg-green-500 animate-pulse' : 'w-2 h-2 rounded-full bg-red-500'"></div>
+                <span [class]="isConnected ? 'text-sm font-medium text-green-700' : 'text-sm font-medium text-red-700'">
+                  {{ isConnected ? 'Connecté' : 'Déconnecté' }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cartes principales -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <!-- Humidité actuelle -->
+          <div class="bg-white rounded-2xl shadow-lg p-6 border-2 border-blue-100">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-gray-600 font-medium">Humidité Sol</h3>
+              <svg class="text-blue-500" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+              </svg>
+            </div>
+            <div class="mb-3">
+              <div class="text-4xl font-bold text-gray-800">{{ realtimeData.humidite }}</div>
+              <div class="text-sm text-gray-500">valeur analogique</div>
+            </div>
+            <div [class]="'inline-block px-3 py-1 rounded-full text-sm font-medium ' + status.bg + ' ' + status.color">
+              {{ status.text }}
+            </div>
+          </div>
+
+          <!-- Seuil -->
+          <div class="bg-white rounded-2xl shadow-lg p-6 border-2 border-purple-100">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-gray-600 font-medium">Seuil Arrosage</h3>
+              <svg class="text-purple-500" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M12 1v6m0 6v6m5.2-13.2l-4.2 4.2m0 6l4.2 4.2M23 12h-6m-6 0H1m18.2 5.2l-4.2-4.2m-6 0l-4.2 4.2"/>
+              </svg>
+            </div>
+            <div class="mb-3">
+              <input
+                type="number"
+                [(ngModel)]="realtimeData.seuil"
+                (ngModelChange)="updateSeuil($event)"
+                class="text-4xl font-bold text-gray-800 w-full border-b-2 border-purple-200 focus:border-purple-500 outline-none bg-transparent"
+              />
+              <div class="text-sm text-gray-500 mt-1">Arrose si humidité &lt; seuil</div>
+            </div>
+            <div class="text-sm text-purple-600 font-medium">
+              Écart: {{ realtimeData.humidite - realtimeData.seuil }}
+            </div>
+          </div>
+
+          <!-- État Pompe -->
+          <div class="bg-white rounded-2xl shadow-lg p-6 border-2 border-green-100">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-gray-600 font-medium">État Pompe</h3>
+              <svg [class]="realtimeData.pompe_active ? 'text-green-500' : 'text-gray-400'" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18.36 6.64a9 9 0 1 1-12.73 0"/>
+                <line x1="12" y1="2" x2="12" y2="12"/>
+              </svg>
+            </div>
+            <div class="mb-3">
+              <div [class]="realtimeData.pompe_active ? 'text-2xl font-bold text-green-600' : 'text-2xl font-bold text-gray-400'">
+                {{ realtimeData.pompe_active ? 'ACTIVE' : 'ARRÊTÉE' }}
+              </div>
+              <div class="text-sm text-gray-500 mt-1">
+                Mode: {{ realtimeData.pompe_manuelle ? 'Manuel' : 'Automatique' }}
+              </div>
+            </div>
+            <div *ngIf="realtimeData.pompe_active" class="flex items-center gap-2 text-sm text-green-600">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="animate-pulse">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+              </svg>
+              <span>Arrosage en cours...</span>
+            </div>
+          </div>
+
+          <!-- Contrôle Manuel -->
+          <div class="bg-white rounded-2xl shadow-lg p-6 border-2 border-orange-100">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-gray-600 font-medium">Contrôle Manuel</h3>
+              <svg class="text-orange-500" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18.36 6.64a9 9 0 1 1-12.73 0"/>
+                <line x1="12" y1="2" x2="12" y2="12"/>
+              </svg>
+            </div>
+            <button
+              (click)="togglePompe()"
+              [class]="realtimeData.pompe_manuelle 
+                ? 'w-full py-4 rounded-xl font-bold text-white transition-all transform hover:scale-105 bg-gradient-to-r from-red-500 to-red-600 shadow-lg shadow-red-500/50'
+                : 'w-full py-4 rounded-xl font-bold text-white transition-all transform hover:scale-105 bg-gradient-to-r from-green-500 to-green-600 shadow-lg shadow-green-500/50'"
+            >
+              {{ realtimeData.pompe_manuelle ? 'DÉSACTIVER' : 'ACTIVER' }}
+            </button>
+            <div class="text-xs text-gray-500 mt-3 text-center">
+              {{ realtimeData.pompe_manuelle 
+                ? 'Mode manuel actif - Pompe forcée ON' 
+                : 'Mode automatique - Contrôle par seuil' }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Graphique Historique -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 mb-8 border-2 border-gray-100">
+          <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-3">
+              <svg class="text-blue-500" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+                <polyline points="17 6 23 6 23 12"/>
+              </svg>
+              <h2 class="text-2xl font-bold text-gray-800">Historique des Mesures</h2>
+            </div>
+            <div class="flex gap-2">
+              <button
+                *ngFor="let period of periods"
+                (click)="setSelectedPeriod(period)"
+                [class]="selectedPeriod === period
+                  ? 'px-4 py-2 rounded-lg font-medium transition-all bg-blue-500 text-white shadow-lg'
+                  : 'px-4 py-2 rounded-lg font-medium transition-all bg-gray-100 text-gray-600 hover:bg-gray-200'"
+              >
+                {{ period }}
+              </button>
+            </div>
+          </div>
+
+          <div class="w-full h-96 relative">
+            <svg class="w-full h-full" viewBox="0 0 800 350" preserveAspectRatio="none">
+              <!-- Grid -->
+              <line *ngFor="let line of gridLines" 
+                    [attr.x1]="line.x1" [attr.y1]="line.y1" 
+                    [attr.x2]="line.x2" [attr.y2]="line.y2" 
+                    stroke="#e5e7eb" stroke-width="1" stroke-dasharray="3,3"/>
+              
+              <!-- Seuil line -->
+              <line x1="0" [attr.y1]="getYPosition(realtimeData.seuil)" 
+                    x2="800" [attr.y2]="getYPosition(realtimeData.seuil)" 
+                    stroke="#f59e0b" stroke-width="2" stroke-dasharray="5,5"/>
+              
+              <!-- Area chart -->
+              <path [attr.d]="getAreaPath()" fill="url(#colorGradient)" opacity="0.6"/>
+              <path [attr.d]="getLinePath()" stroke="#3b82f6" stroke-width="2" fill="none"/>
+              
+              <!-- Gradient -->
+              <defs>
+                <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stop-color="#3b82f6" stop-opacity="0.8"/>
+                  <stop offset="95%" stop-color="#3b82f6" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              
+              <!-- Y-axis labels -->
+              <text *ngFor="let label of yAxisLabels" 
+                    [attr.x]="10" [attr.y]="label.y" 
+                    class="text-xs" fill="#6b7280">{{ label.value }}</text>
+            </svg>
+            
+            <!-- X-axis labels -->
+            <div class="flex justify-between px-2 mt-2">
+              <span *ngFor="let label of xAxisLabels" class="text-xs text-gray-500">{{ label }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Informations système -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="bg-white rounded-xl shadow p-4 border border-gray-100">
+            <div class="flex items-center gap-3">
+              <svg class="text-gray-400" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+              <div>
+                <div class="text-xs text-gray-500">Dernière mise à jour</div>
+                <div class="text-sm font-medium text-gray-800">{{ realtimeData.timestamp }}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-xl shadow p-4 border border-gray-100">
+            <div class="flex items-center gap-3">
+              <svg class="text-gray-400" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 4 23 10 17 10"/>
+                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+              </svg>
+              <div>
+                <div class="text-xs text-gray-500">Fréquence mise à jour</div>
+                <div class="text-sm font-medium text-gray-800">Toutes les 3 secondes</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-xl shadow p-4 border border-gray-100">
+            <div class="flex items-center gap-3">
+              <svg class="text-gray-400" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M12 1v6m0 6v6m5.2-13.2l-4.2 4.2m0 6l4.2 4.2M23 12h-6m-6 0H1m18.2 5.2l-4.2-4.2m-6 0l-4.2 4.2"/>
+              </svg>
+              <div>
+                <div class="text-xs text-gray-500">Mode opération</div>
+                <div class="text-sm font-medium text-gray-800">
+                  {{ realtimeData.pompe_manuelle ? 'Manuel' : 'Automatique' }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-8 text-center text-sm text-gray-500">
+          <p>Système de surveillance connecté • Arduino ESP32 + Firebase + Angular</p>
+        </div>
+      </div>
+    </div>

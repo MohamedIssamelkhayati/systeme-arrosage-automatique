@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+
+.text-red-600 { color: #dc2626; }
+.text-orange-600 { color: #f97316; }
+.text-green-600 { color: #16a34a; }
+.text-blue-600 { color: #2563eb; }
+
+.bg-red-100 { background-color: #fee2e2; }
+.bg-orange-100 { background-color: #ffedd5; }
+.bg-green-100 { background-color: #d1fae5; }
+.bg-blue-100 { background-color: #dbeafe; }
+
+.badge {
+  padding: 3px 8px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+
+
+
+/* style.css */
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f4f7f8;
+  margin: 0;
+  padding: 0;
+}
+
+.app .container {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+/* HEADER */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.logo svg { stroke: #4caf50; }
+.header h1 { font-size: 1.5rem; }
+.header p { font-size: 0.9rem; color: #666; }
+.status { display: flex; align-items: center; gap: 8px; font-weight: bold; }
+.status .dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: red;
+}
+.status.online .dot { background-color: #4caf50; }
+.status.offline .dot { background-color: #f44336; }
+
+/* CARDS */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+.card {
+  background: #f9f9f9;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+.card h3 { font-size: 1.1rem; }
+.value { font-size: 2rem; font-weight: bold; color: #4caf50; }
+.badge { display: inline-block; padding: 3px 8px; border-radius: 8px; font-size: 0.8rem; font-weight: bold; }
+.pump { font-weight: bold; padding: 10px; text-align: center; border-radius: 8px; background-color: #eee; }
+.pump.active { background-color: #4caf50; color: white; }
+input[type="number"] { width: 100%; padding: 6px 10px; border-radius: 6px; border: 1px solid #ccc; }
+.info { font-size: 0.85rem; color: #555; }
+.btn { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; text-transform: uppercase; }
+.btn.on { background-color: #4caf50; color: white; }
+.btn.off { background-color: #f44336; color: white; }
+.hint { font-size: 0.8rem; color: #777; }
+
+/* FOOTER */
+.footer { text-align: center; margin-top: 30px; font-size: 0.85rem; color: #999; }
