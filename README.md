@@ -16,12 +16,11 @@ basé sur la mesure continue de l’humidité du sol.
 ## 🛠️ Matériel utilisé
 - Capteur d’humidité du sol
 - Pompe à eau
-- Microcontrôleur (Arduino / Raspberry Pi / autre)
+- Microcontrôleur (Arduino)
+- ESP32
 - Relais
 
 ## 💻 Logiciel
-- Langage : (Python / Arduino C / MATLAB)
-- Plateforme : (Arduino IDE, Raspberry Pi, etc.)
+- Langage : (Angular / Arduino )
+- Plateforme : (Arduino IDE, VSC, Firebase)
 
-## 📌 Auteur
-- Ton nom
